@@ -1,8 +1,7 @@
 function loadImages(callback) {
     var images = {};
     var sources = {
-        glass1: {src: '/img/glass1.png', type: 'img'},
-        clink1: {src: '/snd/clink1.mp3', type: 'snd'}
+        glass1: 'glass1.png'
     };
     var loadedImages = 0;
     var numImages = 0;
@@ -11,23 +10,13 @@ function loadImages(callback) {
         numImages++;
     }
     for(src in sources) {
-      if(sources[src].type === 'img'){
-        images[src] = new Image();
-        images[src].onload = function() {
-            if(++loadedImages >= numImages) {
-                callback(images);
-            }
-        };
-        images[src].src = sources[src].src;
-      }
-      else{
-        images[src] = new Audio(sources[src].src);
-        images[src].oncanplay = function() {
-            if(++loadedImages >= numImages) {
-                callback(images);
-            }
-        };
-      }
+      images[src] = new Image();
+      images[src].onload = function() {
+          if(++loadedImages >= numImages) {
+              callback(images);
+          }
+      };
+      images[src].src = '/img/'+sources[src];
     }
 }
 
@@ -58,6 +47,7 @@ loadImages(function(images){
     pub.height = pub.clientHeight;
   };
 
+  var sound = new Audio('/snd/clink1.mp3');
   var clink = true;
   var temp = true;
   pub.addEventListener("mousemove", function(e){
@@ -71,7 +61,7 @@ loadImages(function(images){
           var beer = beers[id];
           if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
             clink = false;
-            images.clink1.play();
+            sound.play();
             setTimeout(function(){ clink = true }, 1000);
           }
         }
