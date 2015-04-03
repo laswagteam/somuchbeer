@@ -32,7 +32,6 @@ function loadImages(callback) {
 }
 
 loadImages(function(images){
-  console.log(images);
   var beers = {};
   var socket = io();
   var pub = document.getElementById('pub');
@@ -60,22 +59,26 @@ loadImages(function(images){
   };
 
   var clink = true;
-
+  var temp = true;
   pub.addEventListener("mousemove", function(e){
-    socket.emit('moveBeer', {x:e.x, y:e.y});
-    for(var id in beers) {
-      if(id !== 'mine'){
-        var beer = beers[id];
-        if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
-          clink = false;
-          images.clink1.play();
-          setTimeout(function(){ clink = true }, 1000);
+    if(temp){
+      temp = false;
+      socket.emit('moveBeer', {x:e.x, y:e.y});
+      for(var id in beers) {
+        if(id !== 'mine'){
+          var beer = beers[id];
+          if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
+            clink = false;
+            images.clink1.play();
+            setTimeout(function(){ clink = true }, 1000);
+          }
         }
       }
+      beers['mine'].x=e.x;
+      beers['mine'].y=e.y;
+      drawBeers(pub, beers);
+      setTimeout(function(){ temp = true }, 50);
     }
-    beers['mine'].x=e.x;
-    beers['mine'].y=e.y;
-    drawBeers(pub, beers);
   });
 });
 
