@@ -45,12 +45,12 @@ loadImages(function(images){
 
   socket.on('emptyBeer', function(id){
     delete beers[id];
-    drawBeers(pub, beers, images.glass1);
+    drawBeers(pub, beers);
   });
 
   socket.on('moveBeer', function(pos){
     beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1};
-    drawBeers(pub, beers, images.glass1);
+    drawBeers(pub, beers);
   });
 
   window.onresize = function(event) {
@@ -69,24 +69,24 @@ loadImages(function(images){
       for(var id in beers) {
         if(id !== 'mine'){
           var beer = beers[id];
-          if(clink && e.x > beer.x && e.x < beer.x+images.glass1.width && e.y > beer.y && e.y < beer.y+images.glass1.height){
+          if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
             clink = false;
             images.clink1.play();
-            setTimeout(function(){ clink = true; }, 1000);
+            setTimeout(function(){ clink = true }, 1000);
           }
         }
       }
       beers['mine'].x=e.x;
       beers['mine'].y=e.y;
-      drawBeers(pub, beers, images.glass1);
+      drawBeers(pub, beers);
   });
 });
 
-function drawBeers(pub, beers, glass){
+function drawBeers(pub, beers){
   var ctx = pub.getContext('2d');
   ctx.clearRect(0, 0, pub.clientWidth, pub.clientHeight);
   for(var id in beers) {
     var beer = beers[id];
-    ctx.drawImage(beer.image, beer.x-(glass.width/2), beer.y-(glass.height/2));
+    ctx.drawImage(beer.image, beer.x-(beer.image.width/2), beer.y-(beer.image.height/2));
   }
 }
