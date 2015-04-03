@@ -72,7 +72,10 @@ loadImages(function(images){
           if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
             clink = false;
             images.clink1.play();
-            setTimeout(function(){ clink = true }, 1000);
+            setTimeout(function(){
+              clink = true;
+              drawBeers(pub, beers);
+            }, 1000);
           }
         }
       }
