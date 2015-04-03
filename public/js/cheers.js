@@ -50,14 +50,14 @@ loadImages(function(images){
   var sound = new Audio('/snd/clink1.mp3');
   var clink = true;
   var temp = true;
-  pub.addEventListener("mousemove", function(e){ moveBeer(e, temp, socket, beers, pub) });
+  pub.addEventListener("mousemove", function(e){ moveBeer(e, temp, clink, sound, socket, beers, pub) });
   pub.addEventListener("touchmove", function(e){
     var t = {x: e.touches[e.touches.length-1].clientX, y: e.touches[e.touches.length-1].clientY}
-    moveBeer(t, temp, socket, beers, pub)
+    moveBeer(t, temp, clink, sound, socket, beers, pub)
   });
 });
 
-function moveBeer(e, temp, socket, beers, pub){
+function moveBeer(e, temp, clink, sound, socket, beers, pub){
     if(temp){
       temp = false;
       socket.emit('moveBeer', {x:e.x, y:e.y});
