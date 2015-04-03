@@ -64,6 +64,8 @@ loadImages(function(images){
     if(temp){
       temp = false;
       socket.emit('moveBeer', {x:e.x, y:e.y});
+      setTimeout(function(){ temp = true }, 100);
+    }
       for(var id in beers) {
         if(id !== 'mine'){
           var beer = beers[id];
@@ -77,8 +79,6 @@ loadImages(function(images){
       beers['mine'].x=e.x;
       beers['mine'].y=e.y;
       drawBeers(pub, beers);
-      setTimeout(function(){ temp = true }, 50);
-    }
   });
 });
 
