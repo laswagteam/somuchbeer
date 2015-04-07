@@ -1,5 +1,3 @@
-var city = google.loader.ClientLocation.address.city;
-var flag = google.loader.ClientLocation.address.country.replace(' ','_');
 function loadImages(callback) {
     var images = {};
     var sources = {
@@ -248,6 +246,8 @@ Zimbabwe: 'flags/Zimbabwe.png',
 }
 
 loadImages(function(images){
+  var city = google.loader.ClientLocation.address.city;
+  var flag = google.loader.ClientLocation.address.country.replace(' ','_');
   var beers = {};
   var socket = io();
   var pub = document.getElementById('pub');
