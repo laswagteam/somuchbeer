@@ -246,7 +246,7 @@ Zimbabwe: 'flags/Zimbabwe.png',
 }
 
 loadImages(function(images){
-  if(typeof google.loader.ClientLocation.address !== 'undefined'){
+  if(google.loader.ClientLocation){
     var city = google.loader.ClientLocation.address.city;
     var flag = google.loader.ClientLocation.address.country.replace(' ','_');
   }
