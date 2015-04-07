@@ -244,16 +244,11 @@ Zimbabwe: 'flags/Zimbabwe.png',
       images[src].src = '/img/'+sources[src];
     }
 }
-
+function getgeoip(infos){
 loadImages(function(images){
-  if(google.loader.ClientLocation){
-    var city = google.loader.ClientLocation.address.city;
-    var flag = google.loader.ClientLocation.address.country.replace(' ','_');
-  }
-  else{
-    var city = '';
-    var flag = 'None';
-  }
+  var city = infos.city;
+  var flag = infos.country.replace(' ','_');
+
   var beers = {};
   var socket = io();
   var pub = document.getElementById('pub');
@@ -323,4 +318,5 @@ function drawBeers(pub, beers){
     ctx.fillText(beer.city, beer.x-10, beer.y+(beer.flag.width*2.5));
     ctx.restore();
   }
+}
 }
