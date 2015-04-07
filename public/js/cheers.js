@@ -247,7 +247,7 @@ Zimbabwe: 'flags/Zimbabwe.png',
 function getgeoip(infos){
 loadImages(function(images){
   var city = infos.city;
-  var flag = infos.country.replace(' ','_');
+  var flag = infos.country_name.replace(' ','_');
 
   var beers = {};
   var socket = io();
