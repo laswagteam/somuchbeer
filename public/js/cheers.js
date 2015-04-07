@@ -246,8 +246,14 @@ Zimbabwe: 'flags/Zimbabwe.png',
 }
 
 loadImages(function(images){
-  var city = google.loader.ClientLocation.address.city;
-  var flag = google.loader.ClientLocation.address.country.replace(' ','_');
+  if(typeof google.loader.ClientLocation.address !== 'undefined'){
+    var city = google.loader.ClientLocation.address.city;
+    var flag = google.loader.ClientLocation.address.country.replace(' ','_');
+  }
+  else{
+    var city = '';
+    var flag = 'None';
+  }
   var beers = {};
   var socket = io();
   var pub = document.getElementById('pub');
