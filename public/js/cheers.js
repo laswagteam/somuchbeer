@@ -134,6 +134,19 @@ loadImages(function(images){
   pub.height = pub.clientHeight;
 
   beers['mine']={x:0, y:0, image: images.glass, imageEmpty: images.glassGrey, flag: images[flag], city:city, msg:'', msg2: '', focus: true};
+  socket.emit('whereAreYou');
+
+  socket.on('whereAreYou', function(){
+    socket.emit('moveBeer', {
+      x:beers['mine'].x,
+      y:beers['mine'].y,
+      city:beers['mine'].city,
+      flag:flag,
+      msg2:beers['mine'].msg2,
+      msg:beers['mine'].msg,
+      focus:beers['mine'].focus}
+    );
+  });
   socket.on('newBeer', function(id){
     beers[id]={x:0, y:0, image: images.glass,imageEmpty: images.glassGrey, flag: images['CN'], city:'', msg:'', msg2: '', focus: false};
   });

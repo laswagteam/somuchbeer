@@ -19,6 +19,10 @@ io.on('connection', function(socket){
     pos.id = socket.conn.id;
     socket.broadcast.emit('moveBeer', pos);
   });
+
+  socket.on('whereAreYou', function(){
+    socket.broadcast.emit('whereAreYou');
+  });
 });
 
 http.listen(3000, function(){
