@@ -1,7 +1,8 @@
 function loadImages(callback) {
     var images = {};
     var sources = {
-        glass1: 'glass1.png',
+        glass: 'glass2.png',
+        glassGrey: 'glass-grey.png',
         eye: 'eye.png',
         AD: 'flags/AD.png',
 AE: 'flags/AE.png',
@@ -131,9 +132,9 @@ loadImages(function(images){
   pub.width = pub.clientWidth;
   pub.height = pub.clientHeight;
 
-  beers['mine']={x:0, y:0, image: images.glass1, flag: images[flag], city:city, msg:'', msg2: '', focus: true};
+  beers['mine']={x:0, y:0, image: images.glass, imageEmpty: images.glassGrey, flag: images[flag], city:city, msg:'', msg2: '', focus: true};
   socket.on('newBeer', function(id){
-    beers[id]={x:0, y:0, image: images.glass1, flag: images['CN'], city:'', msg:'', msg2: '', focus: false};
+    beers[id]={x:0, y:0, image: images.glass,imageEmpty: images.glassGrey, flag: images['CN'], city:'', msg:'', msg2: '', focus: false};
   });
 
   socket.on('emptyBeer', function(id){
@@ -148,7 +149,7 @@ loadImages(function(images){
     else{
       var image = images[pos.flag];
     }
-    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: image, city:pos.city, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
+    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass, imageEmpty: images.glassGrey, flag: image, city:pos.city, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
     drawBeers(pub, beers, images['eye']);
   });
 
@@ -228,18 +229,17 @@ function moveBeer(temp, clink, sound, socket, beers, pub, eye, flag){
 function drawBeers(pub, beers, eye){
   var ctx = pub.getContext('2d');
   ctx.clearRect(0, 0, pub.clientWidth, pub.clientHeight);
-  ctx.font = "15px sans serif";
+  ctx.font = "bold 18px Arial";
   ctx.textAlign = "center";
+  ctx.fillStyle = '#ffffff';
   for(var id in beers) {
     var beer = beers[id];
-    ctx.drawImage(beer.image, beer.x-(beer.image.width/2), beer.y-(beer.image.height/2));
-    ctx.drawImage(beer.flag, beer.x-20, beer.y+20);
-    if(beer.focus){
-      ctx.drawImage(eye, beer.x-22, beer.y-10);
-    }
-    ctx.fillText(beer.city, beer.x-10, beer.y+50);
-    ctx.fillText(beer.msg2, beer.x-10, beer.y-(beer.image.height/2)-30);
-    ctx.fillText(beer.msg, beer.x-10, beer.y-(beer.image.height/2)-10);
+    var image = beer.focus ? beer.image : beer.imageEmpty;
+    ctx.drawImage(image, beer.x-(image.width/2), beer.y-(image.height/2));
+    ctx.drawImage(beer.flag, beer.x+4, beer.y+60);
+    ctx.fillText(beer.city, beer.x + 15, (beer.y+image.height/2 + 14));
+    ctx.fillText(beer.msg2, beer.x, beer.y-(image.height/2)-30);
+    ctx.fillText(beer.msg, beer.x, beer.y-(image.height/2)-10);
     ctx.restore();
   }
 }
