@@ -266,7 +266,13 @@ loadImages(function(images){
   });
 
   socket.on('moveBeer', function(pos){
-    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: images[pos.flag], city:pos.city, msg:pos.msg};
+    if(typeof images[pos.flag] === 'undefined'){
+      var image = images['None'];
+    }
+    else{
+      var image = images[pos.flag];
+    }
+    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: image, city:pos.city, msg:pos.msg};
     drawBeers(pub, beers);
   });
 
