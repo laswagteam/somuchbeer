@@ -163,11 +163,13 @@ loadImages(function(images){
   var clink = true;
   var temp = true;
   pub.addEventListener("mousemove", function(e){
+    beers['mine'].focus = true;
     beers['mine'].x = e.x;
     beers['mine'].y = e.y;
     moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag)
   });
   pub.addEventListener("touchmove", function(e){
+    beers['mine'].focus = true;
     beers['mine'].x = e.touches[e.touches.length-1].clientX;
     beers['mine'].y = e.touches[e.touches.length-1].clientY;
     moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
@@ -176,6 +178,7 @@ loadImages(function(images){
   var i = document.getElementById('fakeinput');
 
   i.addEventListener("keyup", function(e){
+    beers['mine'].focus = true;
     if(e.keyCode === 13){
       beers['mine'].msg2 = beers['mine'].msg;
       beers['mine'].msg = '';
