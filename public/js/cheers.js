@@ -255,9 +255,9 @@ loadImages(function(images){
   pub.width = pub.clientWidth;
   pub.height = pub.clientHeight;
 
-  beers['mine']={x:0, y:0, image: images.glass1, flag: images[flag], city:city};
+  beers['mine']={x:0, y:0, image: images.glass1, flag: images[flag], city:city, msg:''};
   socket.on('newBeer', function(id){
-    beers[id]={x:0, y:0, image: images.glass1, flag: images['None'], city:''};
+    beers[id]={x:0, y:0, image: images.glass1, flag: images['None'], city:'', msg:''};
   });
 
   socket.on('emptyBeer', function(id){
@@ -266,7 +266,7 @@ loadImages(function(images){
   });
 
   socket.on('moveBeer', function(pos){
-    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: images[pos.flag], city:pos.city};
+    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: images[pos.flag], city:pos.city, msg:pos.msg};
     drawBeers(pub, beers);
   });
 
@@ -278,31 +278,54 @@ loadImages(function(images){
   var sound = new Audio('/snd/clink1.mp3');
   var clink = true;
   var temp = true;
-  pub.addEventListener("mousemove", function(e){ moveBeer(e, temp, clink, sound, socket, beers, pub, city, flag) });
+  pub.addEventListener("mousemove", function(e){
+    beers['mine'].x = e.x;
+    beers['mine'].y = e.y;
+    moveBeer(temp, clink, sound, socket, beers, pub, city, flag)
+  });
   pub.addEventListener("touchmove", function(e){
-    var t = {x: e.touches[e.touches.length-1].clientX, y: e.touches[e.touches.length-1].clientY}
-    moveBeer(t, temp, clink, sound, socket, beers, pub, city, flag);
+    beers['mine'].x = e.touches[e.touches.length-1].clientX;
+    beers['mine'].y = e.touches[e.touches.length-1].clientY;
+    moveBeer(temp, clink, sound, socket, beers, pub, city, flag);
+  });
+  window.addEventListener("keypress", function(e){
+    beers['mine'].msg+=String.fromCharCode(e.which);
+    moveBeer(temp, clink, sound, socket, beers, pub, city, flag);
+  });
+  window.addEventListener("keydown", function(e){
+    if(e.keyCode === 8){
+      beers['mine'].msg = beers['mine'].msg.substring(0,beers['mine'].msg.length-1);
+    }
+    else if(e.keyCode === 13){
+      beers['mine'].msg = ''
+    }
+    moveBeer(temp, clink, sound, socket, beers, pub, city, flag);
+  });
+
+  window.addEventListener("click", function(e){
+    var i = document.getElementById('fakeinput');
+    i.focus();
   });
 });
 
-function moveBeer(e, temp, clink, sound, socket, beers, pub, city, flag){
+function moveBeer(temp, clink, sound, socket, beers, pub, city, flag){
+    var i = document.getElementById('fakeinput');
+    i.value='';
     if(temp){
       temp = false;
-      socket.emit('moveBeer', {x:e.x, y:e.y, city:city, flag:flag});
+      socket.emit('moveBeer', {x:beers['mine'].x, y:beers['mine'].y, city:beers['mine'].city, flag:flag, msg:beers['mine'].msg});
       setTimeout(function(){ temp = true }, 100);
     }
       for(var id in beers) {
         if(id !== 'mine'){
           var beer = beers[id];
-          if(clink && e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
+          if(clink && beers['mine'].x > beer.x && beers['mine'].x < beer.x+beer.image.width && beers['mine'].y > beer.y && beers['mine'].y < beer.y+beer.image.height){
             clink = false;
             sound.play();
             setTimeout(function(){ clink = true }, 1000);
           }
         }
       }
-      beers['mine'].x=e.x;
-      beers['mine'].y=e.y;
       drawBeers(pub, beers);
 }
 
@@ -316,6 +339,7 @@ function drawBeers(pub, beers){
     ctx.drawImage(beer.image, beer.x-(beer.image.width/2), beer.y-(beer.image.height/2));
     ctx.drawImage(beer.flag, beer.x-beer.flag.width, beer.y+beer.flag.width);
     ctx.fillText(beer.city, beer.x-10, beer.y+(beer.flag.width*2.5));
+    ctx.fillText(beer.msg, beer.x-10, beer.y-(beer.image.height/2)-10);
     ctx.restore();
   }
 }
