@@ -263,7 +263,7 @@ loadImages(function(images){
 
   socket.on('emptyBeer', function(id){
     delete beers[id];
-    drawBeers(pub, beers);
+    drawBeers(pub, beers, images['eye']);
   });
 
   socket.on('moveBeer', function(pos){
@@ -274,7 +274,7 @@ loadImages(function(images){
       var image = images[pos.flag];
     }
     beers[pos.id]={x: pos.x, y: pos.y, image: images.glass1, flag: image, city:pos.city, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
-    drawBeers(pub, beers);
+    drawBeers(pub, beers, images['eye']);
   });
 
   window.onresize = function(event) {
