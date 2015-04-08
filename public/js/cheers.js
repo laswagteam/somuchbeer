@@ -358,11 +358,11 @@ function drawBeers(pub, beers, eye){
   for(var id in beers) {
     var beer = beers[id];
     ctx.drawImage(beer.image, beer.x-(beer.image.width/2), beer.y-(beer.image.height/2));
-    ctx.drawImage(beer.flag, beer.x-beer.flag.width, beer.y+20);
+    ctx.drawImage(beer.flag, beer.x-20, beer.y+20);
     if(beer.focus){
-      ctx.drawImage(eye, beer.x-beer.flag.width-2, beer.y-10);
+      ctx.drawImage(eye, beer.x-22, beer.y-10);
     }
-    ctx.fillText(beer.city, beer.x-10, beer.y+(beer.flag.width*2.5));
+    ctx.fillText(beer.city, beer.x-10, beer.y+50);
     ctx.fillText(beer.msg2, beer.x-10, beer.y-(beer.image.height/2)-30);
     ctx.fillText(beer.msg, beer.x-10, beer.y-(beer.image.height/2)-10);
     ctx.restore();
