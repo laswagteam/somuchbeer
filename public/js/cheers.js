@@ -241,9 +241,9 @@ function drawBeers(pub, beers, eye){
     var image = beer.focus ? beer.image : beer.imageEmpty;
     ctx.drawImage(image, beer.x-(image.width/2), beer.y-(image.height/2));
     ctx.drawImage(beer.flag, beer.x + 4, beer.y + 58);
-    ctx.fillText(beer.city, beer.x + 15, (beer.y+image.height/2 + 14));
-    ctx.fillText(beer.msg2, beer.x, beer.y-(image.height/2)-30);
-    ctx.fillText(beer.msg, beer.x, beer.y-(image.height/2)-10);
+    ctx.fillText(beer.city.substr(0,100), beer.x + 15, (beer.y+image.height/2 + 14));
+    ctx.fillText(beer.msg2.substr(0,100), beer.x, beer.y-(image.height/2)-30);
+    ctx.fillText(beer.msg.substr(0,100), beer.x, beer.y-(image.height/2)-10);
     ctx.restore();
   }
 }
