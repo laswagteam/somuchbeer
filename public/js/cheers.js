@@ -142,6 +142,8 @@ loadImages(function(images){
     delete beers[id];
     drawBeers(pub, beers, images['eye']);
   });
+  var sound = new Audio('/snd/clink1.mp3');
+  var clink = true;
 
   socket.on('moveBeer', function(pos){
     if(typeof images[pos.flag] === 'undefined'){
@@ -149,6 +151,16 @@ loadImages(function(images){
     }
     else{
       var image = images[pos.flag];
+    }
+    for(var id in beers) {
+        if(id !== 'mine'){
+          var beer = beers[id];
+          if(clink && beers['mine'].x > beer.x && beers['mine'].x < beer.x+beer.image.width && beers['mine'].y > beer.y && beers['mine'].y < beer.y+beer.image.height){
+            clink = false;
+            sound.play();
+            setTimeout(function(){ clink = true }, 1000);
+          }
+        }
     }
     beers[pos.id]={x: pos.x, y: pos.y, image: images.glass, imageEmpty: images.glassGrey, flag: image, city:pos.city, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
     drawBeers(pub, beers, images['eye']);
@@ -159,8 +171,6 @@ loadImages(function(images){
     pub.height = pub.clientHeight;
   };
 
-  var sound = new Audio('/snd/clink1.mp3');
-  var clink = true;
   var temp = true;
   pub.addEventListener("mousemove", function(e){
     beers['mine'].focus = true;
