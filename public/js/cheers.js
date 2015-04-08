@@ -121,7 +121,8 @@ YE: 'flags/YE.png'
       images[src].src = '/img/'+sources[src];
     }
 }
-function getgeoip(infos){
+var initialize = function (infos) {
+
 loadImages(function(images){
   var city = infos.city;
   var flag = infos.country_code;
@@ -236,7 +237,7 @@ function drawBeers(pub, beers, eye){
     var beer = beers[id];
     var image = beer.focus ? beer.image : beer.imageEmpty;
     ctx.drawImage(image, beer.x-(image.width/2), beer.y-(image.height/2));
-    ctx.drawImage(beer.flag, beer.x+4, beer.y+60);
+    ctx.drawImage(beer.flag, beer.x + 4, beer.y + 58);
     ctx.fillText(beer.city, beer.x + 15, (beer.y+image.height/2 + 14));
     ctx.fillText(beer.msg2, beer.x, beer.y-(image.height/2)-30);
     ctx.fillText(beer.msg, beer.x, beer.y-(image.height/2)-10);
@@ -244,3 +245,8 @@ function drawBeers(pub, beers, eye){
   }
 }
 }
+
+window.fetch('https://freegeoip.net/json/')
+  .then(function(response){ return response.json(); })
+  .then(function(json){ initialize(json); })
+  .catch(function(){ initialize({ city: 'Somewhere', country_code: 'CN' }); })
