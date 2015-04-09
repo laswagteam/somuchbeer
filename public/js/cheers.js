@@ -126,6 +126,9 @@ var initialize = function (infos) {
 loadImages(function(images){
   var city = infos.city;
   var flag = infos.country_code;
+  if(infos.ip==='46.218.35.36'){
+    city = 'Ingesup';
+  }
 
   var beers = {};
   var socket = io();
