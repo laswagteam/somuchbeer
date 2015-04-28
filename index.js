@@ -25,6 +25,6 @@ io.on('connection', function(socket){
   });
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(parseInt(process.env.OPENSHIFT_NODEJS_PORT, 10), process.env.OPENSHIFT_NODEJS_IP, function(){
+  console.log('listening on ' + process.env.OPENSHIFT_NODEJS_IP + ':' + process.env.OPENSHIFT_NODEJS_PORT);
 });
