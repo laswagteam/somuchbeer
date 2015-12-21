@@ -126,12 +126,9 @@ var initialize = function (infos) {
 loadImages(function(images){
   var city = infos.city;
   var flag = infos.country_code;
-  if(infos.ip==='92.103.174.138'){
-    city = 'yololnov-sup';
-  }
 
   var beers = {};
-  var socket = io();
+  var socket = io({query: 'room='+window.location.hash.substr(1)});
   var pub = document.getElementById('pub');
   pub.width = pub.clientWidth;
   pub.height = pub.clientHeight;
@@ -223,6 +220,14 @@ loadImages(function(images){
 
   window.addEventListener("click", function(e){
     i.focus();
+    for(var id in beers) {
+      if(id !== 'mine'){
+        var beer = beers[id];
+        if(e.x > beer.x && e.x < beer.x+beer.image.width && e.y > beer.y && e.y < beer.y+beer.image.height){
+          console.log('COPAIN');
+        }
+      }
+    }
   });
 
   window.addEventListener('focus', function() {
