@@ -159,6 +159,7 @@ loadImages(function(images){
   var clink = true;
 
   socket.on('moveBeer', function(pos){
+    console.log(pos);
     if(typeof images[pos.flag] === 'undefined'){
       var image = images['CN'];
     }

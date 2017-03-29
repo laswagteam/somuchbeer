@@ -3,10 +3,46 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var url = require('url');
+var sqlite3 = require('sqlite3');
+
+var passport = require('passport');
+var TwitterStrategy = require('passport-twitter').Strategy;
+var twitterKey    = process.env.TWITTER_KEY
+var twitterSecret = process.env.TWITTER_SECRET
+
+var db = new sqlite3.Database('rump.db');
+// db.run("CREATE TABLE rump (name TEXT, title TEXT, description TEXT, vote INTEGER);");
 
 app.use(express.static('public'));
 
+app.use(passport.initialize());
+app.use(passport.session());
+app.get('/auth/twitter', passport.authenticate('twitter'));
+app.get('/auth/twitter/callback',
+  passport.authenticate('twitter', { successRedirect: '/',
+                                     failureRedirect: '/auth/twitter' }));
+
+passport.use(new TwitterStrategy({
+  consumerKey: twitterKey,
+  consumerSecret: twitterSecret,
+  callbackURL: '/auth/twitter/callback'
+}, function(token, tokenSecret, profile, done) {
+  done(null, profile.username);
+}
+));
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
 app.get('/', function(req, res){
+  if(typeof(req.user) !== 'undefined'){
+    req.session.authenticated = req.user;
+  }
   res.sendFile(__dirname+'/index.html');
 });
 
@@ -24,6 +60,7 @@ io.on('connection', function(socket){
 
   socket.on('moveBeer', function(pos){
     pos.id = socket.conn.id;
+    pos.auth = socket.client.request.authenticated;
     socket.broadcast.to(room).emit('moveBeer', pos);
   });
 
