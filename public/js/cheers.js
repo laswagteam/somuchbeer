@@ -4,6 +4,8 @@ function loadImages(callback) {
         glass: 'glass2.png',
         glassGrey: 'glass-grey.png',
         eye: 'eye.png',
+        finger: 'finger.png',
+/*
         AD: 'flags/AD.png',
 AE: 'flags/AE.png',
 AG: 'flags/AG.png',
@@ -33,7 +35,9 @@ EE: 'flags/EE.png',
 EG: 'flags/EG.png',
 ES: 'flags/ES.png',
 FI: 'flags/FI.png',
+*/
 FR: 'flags/FR.png',
+/*
 GA: 'flags/GA.png',
 GB: 'flags/GB.png',
 GM: 'flags/GM.png',
@@ -104,6 +108,7 @@ US: 'flags/US.png',
 VE: 'flags/VE.png',
 VN: 'flags/VN.png',
 YE: 'flags/YE.png'
+*/
     };
     var loadedImages = 0;
     var numImages = 0;
@@ -122,13 +127,14 @@ YE: 'flags/YE.png'
     }
 }
 var initialize = function (infos) {
-
-loadImages(function(images){
+var images;
+loadImages(function(rImages){
+  images = rImages;
   var city = infos.city;
   var flag = infos.country_code;
 
   var beers = {};
-  var socket = io({query: 'room='+window.location.hash.substr(1)});
+  var socket = io('https://rump.much.beer', {query: 'room='+window.location.hash.substr(1)});
   var pub = document.getElementById('pub');
   pub.width = pub.clientWidth;
   pub.height = pub.clientHeight;
@@ -136,7 +142,7 @@ loadImages(function(images){
   beers['mine']={x:0, y:0, image: images.glass, imageEmpty: images.glassGrey, flag: images[flag], city:city, msg:'', msg2: '', focus: true};
   socket.emit('whereAreYou');
 
-  socket.on('whereAreYou', function(){
+  socket.on('whereAreYou', function(pos){
     socket.emit('moveBeer', {
       x:beers['mine'].x,
       y:beers['mine'].y,
@@ -153,13 +159,15 @@ loadImages(function(images){
 
   socket.on('emptyBeer', function(id){
     delete beers[id];
-    drawBeers(pub, beers, images['eye']);
+    drawBeers(pub, beers, images['eye'], rump);
   });
   var sound = new Audio('/snd/clink1.mp3');
   var clink = true;
-
+  var rump;
+  socket.on('rump', function(inRump){
+    rump = inRump;
+  });
   socket.on('moveBeer', function(pos){
-    console.log(pos);
     if(typeof images[pos.flag] === 'undefined'){
       var image = images['CN'];
     }
@@ -176,8 +184,8 @@ loadImages(function(images){
           }
         }
     }
-    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass, imageEmpty: images.glassGrey, flag: image, city:pos.city, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
-    drawBeers(pub, beers, images['eye']);
+    beers[pos.id]={x: pos.x, y: pos.y, image: images.glass, imageEmpty: images.glassGrey, flag: image, city:pos.auth, msg:pos.msg, msg2:pos.msg2, focus:pos.focus};
+    drawBeers(pub, beers, images['eye'], rump);
   });
 
   window.onresize = function(event) {
@@ -190,13 +198,13 @@ loadImages(function(images){
     beers['mine'].focus = true;
     beers['mine'].x = e.x;
     beers['mine'].y = e.y;
-    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag)
+    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump)
   });
   pub.addEventListener("touchmove", function(e){
     beers['mine'].focus = true;
     beers['mine'].x = e.touches[e.touches.length-1].clientX;
     beers['mine'].y = e.touches[e.touches.length-1].clientY;
-    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
   });
 
   var i = document.getElementById('fakeinput');
@@ -207,15 +215,15 @@ loadImages(function(images){
       beers['mine'].msg2 = beers['mine'].msg;
       beers['mine'].msg = '';
       i.value='';
-      moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+      moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
       setTimeout(function(){
         beers['mine'].msg2='';
-        moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+        moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
       }, 2000);
     }
     else{
       beers['mine'].msg=e.target.value;
-      moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+      moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
     }
   });
 
@@ -229,21 +237,29 @@ loadImages(function(images){
         }
       }
     }
+    if(e.x > 13 && e.x < 24) {
+      const id = Math.round((e.y-30)/50);
+      if((e.y-30-50*id) > 9){
+        socket.emit('minus', {title: rump[id].title});
+      } else {
+        socket.emit('plus', {title: rump[id].title});
+      }
+    }
   });
 
   window.addEventListener('focus', function() {
     beers['mine'].focus = true;
-    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
   });
 
   window.addEventListener('blur', function() {
     beers['mine'].focus = false;
-    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag);
+    moveBeer(temp, clink, sound, socket, beers, pub, images['eye'], flag, rump);
   });
 
 });
 
-function moveBeer(temp, clink, sound, socket, beers, pub, eye, flag){
+function moveBeer(temp, clink, sound, socket, beers, pub, eye, flag, rump){
     if(temp){
       temp = false;
       socket.emit('moveBeer', {x:beers['mine'].x, y:beers['mine'].y, city:beers['mine'].city, flag:flag, msg2:beers['mine'].msg2, msg:beers['mine'].msg, focus:beers['mine'].focus});
@@ -259,29 +275,58 @@ function moveBeer(temp, clink, sound, socket, beers, pub, eye, flag){
           }
         }
       }
-      drawBeers(pub, beers, eye);
+      drawBeers(pub, beers, eye, rump);
 }
 
-function drawBeers(pub, beers, eye){
+function drawBeers(pub, beers, eye, rump){
   var ctx = pub.getContext('2d');
   ctx.clearRect(0, 0, pub.clientWidth, pub.clientHeight);
+
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0,0,400,pub.clientHeight);
+
+  var line = 30;
+  ctx.textAlign = "left";
+  rump.forEach(function(r) {
+    ctx.font = "bold 25px Arial";
+    ctx.fillStyle = 'green';
+    ctx.fillText('+', 12, line+5);
+    ctx.fillStyle = 'red';
+    ctx.fillText('-', 15, line+20);
+
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = '#ffffff';
+    var vote = JSON.parse(r.vote);
+    ctx.fillText(`${r.title} by ${r.name} (${vote.length})`, 30, line);
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(`${r.description}`, 30, line+20);
+    line += 50;
+  })
+
   ctx.font = "bold 18px Arial";
-  ctx.textAlign = "center";
   ctx.fillStyle = '#ffffff';
+  ctx.textAlign = "center";
+
   for(var id in beers) {
     var beer = beers[id];
     var image = beer.focus ? beer.image : beer.imageEmpty;
-    ctx.drawImage(image, beer.x-(image.width/2), beer.y-(image.height/2));
-    ctx.drawImage(beer.flag, beer.x + 4, beer.y + 58);
-    ctx.fillText(beer.city.substr(0,100), beer.x + 15, (beer.y+image.height/2 + 14));
-    ctx.fillText(beer.msg2.substr(0,100), beer.x, beer.y-(image.height/2)-30);
-    ctx.fillText(beer.msg.substr(0,100), beer.x, beer.y-(image.height/2)-10);
+    if(beer.x < 400){
+      ctx.drawImage(images.finger, beer.x-42, beer.y-8, 100, 100);
+    } else {
+      ctx.drawImage(image, beer.x-(image.width/2), beer.y-(image.height/2));
+      ctx.drawImage(beer.flag, beer.x + 4, beer.y + 58);
+      ctx.fillText(beer.city.substr(0,100), beer.x + 15, (beer.y+image.height/2 + 14));
+      ctx.fillText(beer.msg2.substr(0,100), beer.x, beer.y-(image.height/2)-30);
+      ctx.fillText(beer.msg.substr(0,100), beer.x, beer.y-(image.height/2)-10);
+    }
     ctx.restore();
   }
 }
+
 }
 
 window.fetch('https://freegeoip.net/json/')
   .then(function(response){ return response.json(); })
   .then(function(json){ initialize(json); })
-  .catch(function(){ initialize({ city: 'Somewhere', country_code: 'CN' }); })
+  .catch(function(){ initialize({ city: 'You', country_code: 'FR' }); })
+
