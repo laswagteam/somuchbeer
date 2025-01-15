@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  npa-vote:
+  somuchbeer:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '127.0.0.1:3001:3000'
-    command: bun run src/index.ts
+      - '127.0.0.1:3002:3000'
+    command: node index.js
     env_file:
       - stack.env
